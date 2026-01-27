@@ -35,7 +35,18 @@ git push origin main
 1. In your Railway project, click **"+ New"**
 2. Select **"Database"** → **"Add PostgreSQL"**
 3. Railway will automatically create a PostgreSQL instance
-4. The `DATABASE_URL` environment variable will be automatically set
+4. The `DATABASE_URL` environment variable will be automatically set in the PostgreSQL service
+
+**IMPORTANT**: After adding PostgreSQL, you need to link it to your web service:
+1. Go to your **web service** (the one running FastAPI)
+2. Click on **"Variables"** tab
+3. Click **"+ New Variable"** or **"Add Reference"**
+4. Select **"Reference Variable from Another Service"**
+5. Choose your **PostgreSQL** service
+6. Select **`DATABASE_URL`** from the list
+7. Save
+
+Alternatively, Railway may auto-share variables if services are in the same project. Check your web service's Variables tab to confirm `DATABASE_URL` is present and points to the PostgreSQL service (not localhost).
 
 #### Redis
 
