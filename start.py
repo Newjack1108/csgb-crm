@@ -16,8 +16,20 @@ def run_migrations():
         # Mask password in output
         masked_url = database_url.split("@")[-1] if "@" in database_url else "***"
         print(f"Database URL: ***@{masked_url}")
+        
+        # Check if it's still pointing to localhost (Railway issue)
+        if "localhost" in database_url or "127.0.0.1" in database_url:
+            print("⚠ ERROR: DATABASE_URL points to localhost!", file=sys.stderr)
+            print("⚠ This means Railway hasn't linked the PostgreSQL service.", file=sys.stderr)
+            print("⚠ Please check Railway dashboard:", file=sys.stderr)
+            print("   1. Go to your web service → Variables", file=sys.stderr)
+            print("   2. Ensure DATABASE_URL references the PostgreSQL service", file=sys.stderr)
+            print("   3. Or add PostgreSQL service reference in service settings", file=sys.stderr)
+            return False  # Fail fast if database URL is wrong
     else:
-        print("⚠ Warning: DATABASE_URL not found in environment", file=sys.stderr)
+        print("⚠ ERROR: DATABASE_URL not found in environment", file=sys.stderr)
+        print("⚠ Please add DATABASE_URL variable in Railway dashboard", file=sys.stderr)
+        return False
     
     # Try to find alembic in common locations
     alembic_paths = [
