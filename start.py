@@ -10,6 +10,15 @@ def run_migrations():
     """Run Alembic migrations"""
     print("Running database migrations...")
     
+    # Check if DATABASE_URL is set (for debugging)
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        # Mask password in output
+        masked_url = database_url.split("@")[-1] if "@" in database_url else "***"
+        print(f"Database URL: ***@{masked_url}")
+    else:
+        print("⚠ Warning: DATABASE_URL not found in environment", file=sys.stderr)
+    
     # Try to find alembic in common locations
     alembic_paths = [
         "alembic",  # In PATH
