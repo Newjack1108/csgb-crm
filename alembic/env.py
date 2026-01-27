@@ -21,9 +21,19 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Get database URL from settings
-from app.core.config import settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Get database URL from environment or settings
+import os
+database_url = os.environ.get("DATABASE_URL")
+if not database_url:
+    # Fall back to settings if DATABASE_URL not in environment
+    try:
+        from app.core.config import settings
+        database_url = settings.DATABASE_URL
+    except Exception:
+        # Last resort: use default (shouldn't happen in production)
+        database_url = "postgresql://postgres:postgres@localhost:5432/csgb_crm"
+
+config.set_main_option("sqlalchemy.url", database_url)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
