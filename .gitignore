@@ -63,3 +63,8 @@ railway.json.local
 
 # GitHub
 .github/workflows/*.local.yml
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+app/static/

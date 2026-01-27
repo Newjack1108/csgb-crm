@@ -29,6 +29,7 @@ A FastAPI-based CRM system for lead management, customer tracking, and automated
 ### Prerequisites
 
 - Python 3.11+
+- Node.js 18+ (for frontend)
 - PostgreSQL
 - Redis
 
@@ -60,7 +61,15 @@ cp .env.example .env
    - Redis URL
    - Twilio credentials (if using SMS features)
 
-6. Run database migrations:
+6. Build the frontend:
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+7. Run database migrations:
 ```bash
 alembic upgrade head
 ```
@@ -91,8 +100,10 @@ python -m app.worker
 rq worker default --url $REDIS_URL
 ```
 
-The API will be available at `http://localhost:8000`
-API documentation at `http://localhost:8000/docs`
+The application will be available at:
+- **Frontend UI**: `http://localhost:8000`
+- **API**: `http://localhost:8000/api/`
+- **API Documentation**: `http://localhost:8000/docs`
 
 ## API Endpoints
 
