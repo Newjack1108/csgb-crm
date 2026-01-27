@@ -9,6 +9,15 @@ import subprocess
 def run_migrations():
     """Run Alembic migrations"""
     print("Running database migrations...")
+    
+    # Try to find alembic in common locations
+    alembic_paths = [
+        "alembic",  # In PATH
+        "/opt/venv/bin/alembic",  # Railway virtual environment
+        "python", "-m", "alembic",  # As Python module
+    ]
+    
+    # Try as direct command first
     try:
         result = subprocess.run(
             ["alembic", "upgrade", "head"],
@@ -17,14 +26,31 @@ def run_migrations():
             text=True
         )
         print(result.stdout)
+        if result.stderr:
+            print(result.stderr, file=sys.stderr)
         print("✓ Migrations completed successfully")
         return True
-    except subprocess.CalledProcessError as e:
-        print(f"✗ Migration failed: {e.stderr}", file=sys.stderr)
-        return False
-    except FileNotFoundError:
-        print("⚠ Warning: alembic not found, skipping migrations", file=sys.stderr)
-        return True  # Continue anyway in case alembic is in a different path
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        # Try as Python module
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "alembic", "upgrade", "head"],
+                check=True,
+                capture_output=True,
+                text=True
+            )
+            print(result.stdout)
+            if result.stderr:
+                print(result.stderr, file=sys.stderr)
+            print("✓ Migrations completed successfully")
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"✗ Migration failed: {e.stderr}", file=sys.stderr)
+            return False
+        except Exception as e:
+            print(f"⚠ Warning: Could not run migrations: {e}", file=sys.stderr)
+            print("⚠ Continuing without migrations (database may need manual setup)", file=sys.stderr)
+            return True  # Continue anyway to allow manual migration
 
 def start_server():
     """Start the FastAPI server"""
