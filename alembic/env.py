@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+import sys
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -24,14 +25,31 @@ if config.config_file_name is not None:
 # Get database URL from environment or settings
 import os
 database_url = os.environ.get("DATABASE_URL")
-if not database_url:
+
+# Debug: Print what we found (mask password)
+if database_url:
+    masked = database_url.split("@")[-1] if "@" in database_url else "***"
+    print(f"[Alembic] Using DATABASE_URL from environment: ***@{masked}")
+else:
+    print("[Alembic] WARNING: DATABASE_URL not found in environment, trying settings...", file=sys.stderr)
     # Fall back to settings if DATABASE_URL not in environment
     try:
         from app.core.config import settings
         database_url = settings.DATABASE_URL
-    except Exception:
+        masked = database_url.split("@")[-1] if "@" in database_url else "***"
+        print(f"[Alembic] Using DATABASE_URL from settings: ***@{masked}")
+    except Exception as e:
+        print(f"[Alembic] ERROR: Could not load DATABASE_URL from settings: {e}", file=sys.stderr)
         # Last resort: use default (shouldn't happen in production)
         database_url = "postgresql://postgres:postgres@localhost:5432/csgb_crm"
+        print("[Alembic] ERROR: Using default localhost URL - this will fail in production!", file=sys.stderr)
+
+# Validate we're not using localhost in production
+if database_url and ("localhost" in database_url or "127.0.0.1" in database_url):
+    print("[Alembic] ERROR: DATABASE_URL points to localhost!", file=sys.stderr)
+    print("[Alembic] This means the environment variable is not set correctly.", file=sys.stderr)
+    print("[Alembic] Please check Railway Variables and ensure DATABASE_URL references PostgreSQL service.", file=sys.stderr)
+    raise ValueError("DATABASE_URL must not point to localhost in production")
 
 config.set_main_option("sqlalchemy.url", database_url)
 
