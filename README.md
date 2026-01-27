@@ -286,6 +286,7 @@ csgb-crm/
   app/
     main.py                 # FastAPI app
     worker.py               # RQ worker
+    static/                 # Frontend build output (generated)
     core/
       config.py            # Settings
       db.py                # Database session
@@ -297,6 +298,9 @@ csgb-crm/
       comms/               # Communications (SMS)
       automation/          # Background jobs
       opportunities/       # Sales opportunities
+  frontend/                 # React frontend
+    src/                   # Source files
+    package.json           # Node dependencies
   alembic/                 # Database migrations
   requirements.txt
   Procfile                 # Railway deployment
