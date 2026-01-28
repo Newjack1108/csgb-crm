@@ -4,10 +4,10 @@ nixPkgs = ["nodejs-18_x", "python312"]
 [phases.install]
 dependsOn = ["setup"]
 cmds = [
-  "cd frontend && npm install",
-  "cd frontend && npm run build",
   "python3 -m pip install --upgrade pip",
-  "python3 -m pip install -r requirements.txt"
+  "python3 -m pip install -r requirements.txt",
+  "cd frontend && npm install",
+  "cd frontend && npm run build"
 ]
 
 [start]
