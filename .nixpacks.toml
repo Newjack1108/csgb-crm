@@ -1,3 +1,7 @@
+[providers]
+node = "18"
+python = "3.12"
+
 [phases.setup]
 nixPkgs = ["nodejs-18_x", "python312"]
 
@@ -9,6 +13,9 @@ cmds = [
   "cd frontend && npm install",
   "cd frontend && npm run build"
 ]
+
+[phases.build]
+cmds = []
 
 [start]
 cmd = "python3 start.py"

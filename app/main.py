@@ -59,9 +59,16 @@ if os.path.exists(static_dir):
         index_path = os.path.join(static_dir, "index.html")
         if os.path.exists(index_path):
             return FileResponse(index_path)
-        return {"message": "Frontend not built. Run 'npm run build' in frontend directory."}
+        return {"message": "Frontend not built. Run 'npm run build' in frontend directory.", "static_dir": static_dir, "exists": os.path.exists(static_dir)}
 else:
     # Fallback if static directory doesn't exist
     @app.get("/")
     async def root():
-        return {"message": "CSGB CRM API", "version": "0.1.0", "frontend": "Not built"}
+        static_dir_check = os.path.join(os.path.dirname(__file__), "static")
+        return {
+            "message": "CSGB CRM API", 
+            "version": "0.1.0", 
+            "frontend": "Not built",
+            "static_dir": static_dir_check,
+            "exists": os.path.exists(static_dir_check)
+        }
