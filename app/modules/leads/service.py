@@ -197,7 +197,7 @@ def update_lead(db: Session, lead_id: UUID, lead_update: LeadUpdate) -> Optional
         # Update status based on missing fields
         if lead.missing_fields:
             lead.status = LeadStatus.NEEDS_INFO
-        elif lead.status == LeadStatus.NEEDS_INFO:
+        elif lead.status == LeadStatus.NEEDS_INFO.value:
             lead.status = LeadStatus.NEW
     
     db.commit()
