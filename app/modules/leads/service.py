@@ -155,12 +155,13 @@ def create_lead_manual(
 
 def get_lead_inbox(db: Session, limit: int = 100, offset: int = 0) -> List[Lead]:
     """Get leads for inbox (status NEW or NEEDS_INFO), ordered newest first"""
+    # Use string literals to match database enum values (lowercase)
     stmt = (
         select(Lead)
         .where(
             or_(
-                Lead.status == LeadStatus.NEW.value,
-                Lead.status == LeadStatus.NEEDS_INFO.value,
+                Lead.status == "new",
+                Lead.status == "needs_info",
             )
         )
         .order_by(Lead.created_at.desc())
