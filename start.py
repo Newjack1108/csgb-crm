@@ -79,12 +79,27 @@ def start_server():
     print(f"Starting FastAPI server on port {port}...")
     
     # Use uvicorn to start the server
-    os.execvp("uvicorn", [
-        "uvicorn",
-        "app.main:app",
-        "--host", "0.0.0.0",
-        "--port", port
-    ])
+    # Try python3 first, fall back to python
+    import shutil
+    python_cmd = shutil.which("python3") or shutil.which("python") or "python"
+    uvicorn_cmd = shutil.which("uvicorn") or f"{python_cmd} -m uvicorn"
+    
+    if uvicorn_cmd.startswith(python_cmd):
+        # Use python -m uvicorn
+        os.execvp(python_cmd, [
+            python_cmd, "-m", "uvicorn",
+            "app.main:app",
+            "--host", "0.0.0.0",
+            "--port", port
+        ])
+    else:
+        # Use uvicorn directly
+        os.execvp("uvicorn", [
+            "uvicorn",
+            "app.main:app",
+            "--host", "0.0.0.0",
+            "--port", port
+        ])
 
 if __name__ == "__main__":
     if not run_migrations():

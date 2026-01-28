@@ -1,3 +1,2 @@
-web: python start.py
-worker: python -m app.worker
-build-frontend: cd frontend && npm install && npm run build
+web: python3 start.py
+worker: python3 -m app.worker
