@@ -1,10 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 import os
 
 from app.core.config import settings
+from app.core.db import get_db
 from app.modules.leads.router import router as leads_router
 from app.modules.comms.router import router as comms_router
 from app.modules.automation.router import router as automation_router
