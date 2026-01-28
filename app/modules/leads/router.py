@@ -75,8 +75,14 @@ async def get_inbox(
     db: Session = Depends(get_db),
 ):
     """Get lead inbox (status NEW or NEEDS_INFO), ordered newest first"""
-    leads = get_lead_inbox(db=db, limit=limit, offset=offset)
-    return [LeadInboxItem.model_validate(lead) for lead in leads]
+    try:
+        leads = get_lead_inbox(db=db, limit=limit, offset=offset)
+        return [LeadInboxItem.model_validate(lead) for lead in leads]
+    except Exception as e:
+        import traceback
+        print(f"Error in get_inbox: {e}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
 @router.get("/{lead_id}", response_model=LeadDetail)
