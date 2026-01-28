@@ -29,10 +29,14 @@ app.include_router(leads_router, prefix="/api/leads", tags=["leads"])
 app.include_router(comms_router, prefix="/api/comms", tags=["comms"])
 app.include_router(automation_router, prefix="/api/automation", tags=["automation"])
 
-# Serve static files (frontend)
+# Serve static files (frontend) - must be before catch-all route
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+    # Mount static assets (JS, CSS, etc.)
+    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
+    # Serve other static files
+    static_files = StaticFiles(directory=static_dir)
+    app.mount("/static", static_files, name="static")
 
 
 @app.get("/health")
@@ -47,7 +51,7 @@ if os.path.exists(static_dir):
     async def serve_frontend(full_path: str):
         # Skip API routes, docs, and static files - these are handled by FastAPI
         if any(full_path.startswith(prefix) for prefix in [
-            "api", "docs", "redoc", "openapi.json", "health", "static"
+            "api", "docs", "redoc", "openapi.json", "health", "static", "assets"
         ]):
             from fastapi import HTTPException
             raise HTTPException(status_code=404, detail="Not found")
@@ -56,3 +60,8 @@ if os.path.exists(static_dir):
         if os.path.exists(index_path):
             return FileResponse(index_path)
         return {"message": "Frontend not built. Run 'npm run build' in frontend directory."}
+else:
+    # Fallback if static directory doesn't exist
+    @app.get("/")
+    async def root():
+        return {"message": "CSGB CRM API", "version": "0.1.0", "frontend": "Not built"}
