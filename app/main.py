@@ -67,8 +67,9 @@ if os.path.exists(static_dir):
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
         # Skip API routes, docs, and static files - these are handled by FastAPI
+        # Note: health routes are handled above, so they won't reach here
         if any(full_path.startswith(prefix) for prefix in [
-            "api", "docs", "redoc", "openapi.json", "health", "static", "assets"
+            "api", "docs", "redoc", "openapi.json", "static", "assets"
         ]):
             from fastapi import HTTPException
             raise HTTPException(status_code=404, detail="Not found")
