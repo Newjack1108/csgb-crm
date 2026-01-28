@@ -1,15 +1,18 @@
 providers = ["python", "node", "..."]
 
 [phases.setup]
-nixPkgs = ["python312", "python312Packages.pip", "python312Packages.setuptools"]
+nixPkgs = ["python312"]
 
 [phases.install]
 dependsOn = ["setup"]
 cmds = [
   "echo '=== Starting build process ==='",
   "pwd",
-  "echo 'Step 1: Installing Python dependencies...'",
+  "echo 'Step 1: Bootstrapping pip...'",
+  "python3 -m ensurepip --upgrade || python3 -m ensurepip",
+  "echo 'Step 2: Upgrading pip...'",
   "python3 -m pip install --upgrade pip",
+  "echo 'Step 3: Installing Python dependencies...'",
   "python3 -m pip install -r requirements.txt",
   "echo 'Step 2: Installing Node.js dependencies...'",
   "cd frontend && npm install || (echo 'npm install failed' && exit 1)",
