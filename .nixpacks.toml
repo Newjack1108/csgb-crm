@@ -1,16 +1,13 @@
 providers = ["python", "node"]
 
 [phases.setup]
-nixPkgs = []
+nixPkgs = ["python312", "python312Packages.pip", "python312Packages.setuptools"]
 
 [phases.install]
 dependsOn = ["setup"]
 cmds = [
   "echo '=== Starting build process ==='",
   "pwd",
-  "which python3",
-  "which pip",
-  "python3 --version",
   "echo 'Step 1: Installing Python dependencies...'",
   "python3 -m pip install --upgrade pip",
   "python3 -m pip install -r requirements.txt",
