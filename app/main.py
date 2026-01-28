@@ -41,7 +41,21 @@ if os.path.exists(static_dir):
 
 @app.get("/health")
 async def health():
+    """Health check endpoint"""
     return {"status": "healthy"}
+
+
+@app.get("/health/db")
+async def health_db(db: Session = Depends(get_db)):
+    """Database health check"""
+    try:
+        # Try a simple query
+        from sqlalchemy import text
+        result = db.execute(text("SELECT 1"))
+        result.fetchone()
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"status": "unhealthy", "database": "error", "error": str(e)}
 
 
 # Serve frontend for all non-API routes (must be last)

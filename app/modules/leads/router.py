@@ -77,11 +77,33 @@ async def get_inbox(
     """Get lead inbox (status NEW or NEEDS_INFO), ordered newest first"""
     try:
         leads = get_lead_inbox(db=db, limit=limit, offset=offset)
-        return [LeadInboxItem.model_validate(lead) for lead in leads]
+        # Convert to schema with explicit error handling
+        result = []
+        for lead in leads:
+            try:
+                item = LeadInboxItem(
+                    id=lead.id,
+                    source=lead.source,
+                    status=lead.status,
+                    name=lead.name,
+                    email=lead.email,
+                    phone=lead.phone,
+                    missing_fields=lead.missing_fields,
+                    created_at=lead.created_at,
+                )
+                result.append(item)
+            except Exception as e:
+                import traceback
+                error_msg = f"Error serializing lead {lead.id}: {str(e)}\n{traceback.format_exc()}"
+                print(error_msg, file=__import__('sys').stderr)
+                raise HTTPException(status_code=500, detail=error_msg)
+        return result
+    except HTTPException:
+        raise
     except Exception as e:
         import traceback
-        print(f"Error in get_inbox: {e}")
-        print(traceback.format_exc())
+        error_msg = f"Error in get_inbox: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg, file=__import__('sys').stderr)
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
