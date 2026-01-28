@@ -159,8 +159,8 @@ def get_lead_inbox(db: Session, limit: int = 100, offset: int = 0) -> List[Lead]
         select(Lead)
         .where(
             or_(
-                Lead.status == LeadStatus.NEW,
-                Lead.status == LeadStatus.NEEDS_INFO,
+                Lead.status == LeadStatus.NEW.value,
+                Lead.status == LeadStatus.NEEDS_INFO.value,
             )
         )
         .order_by(Lead.created_at.desc())
