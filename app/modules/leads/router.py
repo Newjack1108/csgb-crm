@@ -76,7 +76,7 @@ async def get_inbox(
 ):
     """Get lead inbox (status NEW or NEEDS_INFO), ordered newest first"""
     leads = get_lead_inbox(db=db, limit=limit, offset=offset)
-    return leads
+    return [LeadInboxItem.model_validate(lead) for lead in leads]
 
 
 @router.get("/{lead_id}", response_model=LeadDetail)
