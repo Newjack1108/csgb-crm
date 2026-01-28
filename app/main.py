@@ -26,21 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers with /api prefix
-app.include_router(leads_router, prefix="/api/leads", tags=["leads"])
-app.include_router(comms_router, prefix="/api/comms", tags=["comms"])
-app.include_router(automation_router, prefix="/api/automation", tags=["automation"])
-
-# Serve static files (frontend) - must be before catch-all route
-static_dir = os.path.join(os.path.dirname(__file__), "static")
-if os.path.exists(static_dir):
-    # Mount static assets (JS, CSS, etc.)
-    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
-    # Serve other static files
-    static_files = StaticFiles(directory=static_dir)
-    app.mount("/static", static_files, name="static")
-
-
+# Health check endpoints (must be before catch-all route)
 @app.get("/health")
 async def health():
     """Health check endpoint"""
@@ -58,6 +44,21 @@ async def health_db(db: Session = Depends(get_db)):
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "database": "error", "error": str(e)}
+
+
+# Register routers with /api prefix
+app.include_router(leads_router, prefix="/api/leads", tags=["leads"])
+app.include_router(comms_router, prefix="/api/comms", tags=["comms"])
+app.include_router(automation_router, prefix="/api/automation", tags=["automation"])
+
+# Serve static files (frontend) - must be before catch-all route
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    # Mount static assets (JS, CSS, etc.)
+    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
+    # Serve other static files
+    static_files = StaticFiles(directory=static_dir)
+    app.mount("/static", static_files, name="static")
 
 
 # Serve frontend for all non-API routes (must be last)
