@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_, or_, cast, String
 from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
@@ -155,13 +155,13 @@ def create_lead_manual(
 
 def get_lead_inbox(db: Session, limit: int = 100, offset: int = 0) -> List[Lead]:
     """Get leads for inbox (status NEW or NEEDS_INFO), ordered newest first"""
-    # Use string literals to match database enum values (lowercase)
+    # Cast enum column to string and compare with lowercase values to match database enum
     stmt = (
         select(Lead)
         .where(
             or_(
-                Lead.status == "new",
-                Lead.status == "needs_info",
+                cast(Lead.status, String) == "new",
+                cast(Lead.status, String) == "needs_info",
             )
         )
         .order_by(Lead.created_at.desc())
