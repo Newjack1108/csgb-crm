@@ -8,15 +8,19 @@ nixPkgs = ["nodejs-18_x", "python312"]
 [phases.install]
 dependsOn = ["setup"]
 cmds = [
-  "echo 'Installing Python dependencies...'",
+  "echo '=== Starting build process ==='",
+  "pwd",
+  "echo 'Step 1: Installing Python dependencies...'",
   "python3 -m pip install --upgrade pip",
   "python3 -m pip install -r requirements.txt",
-  "echo 'Installing Node.js dependencies...'",
-  "cd frontend && npm install",
-  "echo 'Building frontend...'",
-  "cd frontend && npm run build",
-  "echo 'Build complete. Checking output...'",
-  "ls -la app/static/ || echo 'Warning: static directory not found'"
+  "echo 'Step 2: Installing Node.js dependencies...'",
+  "cd frontend && npm install || (echo 'npm install failed' && exit 1)",
+  "echo 'Step 3: Building frontend...'",
+  "cd frontend && npm run build || (echo 'npm run build failed' && exit 1)",
+  "echo 'Step 4: Verifying build output...'",
+  "cd ..",
+  "ls -la app/static/ || (echo 'ERROR: app/static/ not found!' && ls -la app/ && exit 1)",
+  "echo '=== Build complete ==='"
 ]
 
 [phases.build]
