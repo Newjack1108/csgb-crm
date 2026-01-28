@@ -1,27 +1,20 @@
 providers = ["python", "node", "..."]
 
 [phases.setup]
-nixPkgs = ["python312"]
+nixPkgs = []
 
 [phases.install]
 dependsOn = ["setup"]
 cmds = [
-  "echo '=== Starting build process ==='",
-  "pwd",
-  "echo 'Step 1: Bootstrapping pip...'",
-  "python3 -m ensurepip --upgrade || python3 -m ensurepip",
-  "echo 'Step 2: Upgrading pip...'",
-  "python3 -m pip install --upgrade pip",
-  "echo 'Step 3: Installing Python dependencies...'",
-  "python3 -m pip install -r requirements.txt",
-  "echo 'Step 2: Installing Node.js dependencies...'",
+  "echo '=== Building frontend ==='",
+  "echo 'Step 1: Installing Node.js dependencies...'",
   "cd frontend && npm install || (echo 'npm install failed' && exit 1)",
-  "echo 'Step 3: Building frontend...'",
+  "echo 'Step 2: Building frontend...'",
   "cd frontend && npm run build || (echo 'npm run build failed' && exit 1)",
-  "echo 'Step 4: Verifying build output...'",
+  "echo 'Step 3: Verifying build output...'",
   "cd ..",
   "ls -la app/static/ || (echo 'ERROR: app/static/ not found!' && ls -la app/ && exit 1)",
-  "echo '=== Build complete ==='"
+  "echo '=== Frontend build complete ==='"
 ]
 
 [phases.build]
